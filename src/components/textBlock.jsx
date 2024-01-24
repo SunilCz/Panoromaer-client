@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import axios from "axios";
 import "../App.css";
 
 function TextBlock() {
@@ -29,25 +28,30 @@ function TextBlock() {
     setFiles(updatedFiles);
   };
 
-  const handlePostClick = () => {
-    if (process.env.REACT_APP_API_URL) {
+  const handlePostClick = async () => {
+    try {
+      const apiUrl = "http://127.0.0.1:5000"; // Replace with your actual API URL
       const formData = new FormData();
       files.forEach((file) => {
         formData.append("files[]", file);
       });
 
-      axios
-        .post(`${process.env.REACT_APP_API_URL}/upload`, formData)
-        .then((response) => {
-          console.log(response.data.message);
-          // Handle success if needed
-        })
-        .catch((error) => {
-          console.error("Error uploading images:", error.response.data.message);
-          // Handle the error as needed
-        });
-    } else {
-      console.error("REACT_APP_API_URL is not defined in the environment.");
+      const response = await fetch(`${apiUrl}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log(responseData.message);
+        // Handle success if needed
+      } else {
+        const errorData = await response.json();
+        console.error("Error uploading images:", errorData.message);
+        // Handle the error as needed
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
     }
   };
 
