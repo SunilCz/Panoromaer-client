@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../App.css";
 
 function TextBlock() {
@@ -20,8 +22,6 @@ function TextBlock() {
     multiple: true,
   });
 
-  const rootProps = getRootProps(); // Call getRootProps here
-
   const removeFile = (index) => {
     const updatedFiles = [...files];
     updatedFiles.splice(index, 1);
@@ -30,7 +30,7 @@ function TextBlock() {
 
   const handlePostClick = async () => {
     try {
-      const apiUrl = "http://127.0.0.1:5000"; // Replace with your actual API URL
+      const apiUrl = "http://127.0.0.1:5000";
       const formData = new FormData();
       files.forEach((file) => {
         formData.append("files[]", file);
@@ -44,11 +44,13 @@ function TextBlock() {
       if (response.ok) {
         const responseData = await response.json();
         console.log(responseData.message);
-        // Handle success if needed
+
+        toast.success("Upload successful!");
+
+        setFiles([]);
       } else {
         const errorData = await response.json();
         console.error("Error uploading images:", errorData.message);
-        // Handle the error as needed
       }
     } catch (error) {
       console.error("An error occurred:", error);
@@ -67,7 +69,7 @@ function TextBlock() {
       }}
     >
       <div
-        {...rootProps}
+        {...getRootProps()}
         className={`dropzone ${isDragActive ? "active" : ""}`}
         style={{
           border: "2px dashed #cccccc",
@@ -139,6 +141,8 @@ function TextBlock() {
           Post
         </button>
       )}
+
+      <ToastContainer />
     </div>
   );
 }
